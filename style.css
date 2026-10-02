@@ -1,0 +1,136 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Fullscreen 3D viewport; the camera sits at the centre of the cylinder. */
+.viewport {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  perspective: var(--perspective, 800px);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+
+.viewport.dragging {
+  cursor: grabbing;
+}
+
+.stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #111;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.item.loaded {
+  opacity: 1;
+}
+
+.item.hidden {
+  visibility: hidden;
+}
+
+.item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* box already matches the original aspect ratio */
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+/* Darkening overlay: --shade gives depth towards the edges,
+   the hover state dims everything except the active photo. */
+.item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: var(--shade, 0);
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.stage.focus .item::after {
+  opacity: max(var(--shade, 0), 0.72);
+}
+
+.stage.focus .item.active::after {
+  opacity: 0;
+}
+
+.item.active {
+  box-shadow: 0 0 60px rgba(255, 255, 255, 0.18);
+}
+
+.item.active img {
+  filter: brightness(1.12) contrast(1.04);
+}
+
+.loader,
+.hint {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+
+.loader {
+  top: 50%;
+}
+
+.hint {
+  bottom: max(24px, env(safe-area-inset-bottom));
+}
+
+.loader.done,
+.hint.done {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item,
+  .item::after {
+    transition: none;
+  }
+}
